@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Utilisateurs ────────────────────────────────────────
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  name          String
+  avatar        String?
+  role          Role      @default(USER)
+  provider      AuthProvider @default(LOCAL)
+  providerId    String?
+  plan          Plan      @default(FREE)
+  planExpiresAt DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  projects      Project[]
+  collaborations Collaboration[]
+  comments      Comment[]
+  activities    Activity[]
+  sessions      Session[]
+
+  @@index([email])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Projets ─────────────────────────────────────────────
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(DRAFT)
+  ownerId     String
+  country     String   @default("FR")
+  isPublic    Boolean  @default(false)
+  isFavorite  Boolean  @default(false)
+
+  // Terrain
+  terrainLength  Float?
+  terrainWidth   Float?
+  terrainArea    Float?
+  terrainOrientation String?
+  terrainType    TerrainType @default(FLAT)
+
+  // Maison
+  houseType      HouseType @default(MODERN)
+  floors         Int       @default(1)
+  bedrooms       Int?
+  livingRooms    Int?
+  kitchens       Int?
+  bathrooms      Int?
+  hasGarage      Boolean   @default(false)
+  hasPool        Boolean   @default(false)
+  hasTerrace     Boolean   @default(false)
+  hasBalcony     Boolean   @default(false)
+  hasGarden      Boolean   @default(false)
+
+  // Description libre IA
+  freeDescription String?
+
+  // Données générées
+  plans          Json?     // Plans générés (A, B, C, D)
+  activePlan     String?   // Plan sélectionné
+  model3D        Json?     // Données modèle 3D
+  materials      Json?     // Estimation matériaux
+  budget         Json?     // Estimation budget
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  owner          User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  versions       ProjectVersion[]
+  collaborations Collaboration[]
+  comments       Comment[]
+  activities     Activity[]
+  aiMessages     AIMessage[]
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model ProjectVersion {
+  id        String   @id @default(uuid())
+  projectId String
+  version   Int
+  data      Json
+  label     String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model AIMessage {
+  id        String   @id @default(uuid())
+  projectId String
+  role      MessageRole
+  content   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// ─── Collaboration ───────────────────────────────────────
+model Collaboration {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      CollabRole @default(VIEWER)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  content   String
+  x         Float?
+  y         Float?
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  projectId String?
+  userId    String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+// ─── Enums ───────────────────────────────────────────────
+enum Role {
+  USER
+  ARCHITECT
+  ADMIN
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  GITHUB
+}
+
+enum Plan {
+  FREE
+  PRO
+  ARCHITECT
+  ENTERPRISE
+}
+
+enum ProjectStatus {
+  DRAFT
+  GENERATING
+  READY
+  MODIFIED
+  ARCHIVED
+}
+
+enum TerrainType {
+  FLAT
+  SLOPE
+  ANGLE
+  IRREGULAR
+}
+
+enum HouseType {
+  VILLA
+  DUPLEX
+  TRIPLEX
+  BUILDING
+  RESIDENCE
+  MODERN
+  LUXURY
+  TRADITIONAL
+  BUNGALOW
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum CollabRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}

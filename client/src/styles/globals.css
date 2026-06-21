@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-dark-500; }
+  body { @apply bg-dark-900 text-white; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-dark-400 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-dark-300; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-brand-500 text-white rounded-xl font-semibold
+           hover:bg-brand-600 active:scale-[0.98] transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply px-6 py-3 bg-dark-600 text-dark-100 rounded-xl font-semibold
+           hover:bg-dark-500 active:scale-[0.98] transition-all duration-200
+           border border-dark-400;
+  }
+  .btn-ghost {
+    @apply px-4 py-2 text-dark-200 rounded-xl hover:bg-dark-600 hover:text-white
+           transition-all duration-200;
+  }
+  .btn-danger {
+    @apply px-4 py-2 bg-red-500/10 text-red-400 rounded-xl
+           hover:bg-red-500/20 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-dark-800 border border-dark-500/50 rounded-2xl p-6
+           hover:border-dark-400 transition-all duration-300;
+  }
+  .card-glow {
+    @apply card relative overflow-hidden;
+    &::before {
+      content: '';
+      @apply absolute inset-0 bg-gradient-to-br from-brand-500/5 to-transparent opacity-0
+             transition-opacity duration-500;
+    }
+    &:hover::before { opacity: 1; }
+  }
+
+  .input {
+    @apply w-full bg-dark-700 border border-dark-500 rounded-xl px-4 py-3 text-sm
+           placeholder:text-dark-300 focus:outline-none focus:ring-2 focus:ring-brand-500/50
+           focus:border-brand-500 transition-all duration-200;
+  }
+  .select {
+    @apply input appearance-none cursor-pointer;
+  }
+  .label {
+    @apply text-sm font-medium text-dark-100 mb-1.5 block;
+  }
+
+  .glass {
+    @apply bg-dark-800/80 backdrop-blur-xl border border-dark-500/30;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-emerald-300;
+  }
+
+  .stat-card {
+    @apply card flex flex-col gap-2;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-green { @apply badge bg-brand-500/10 text-brand-400; }
+  .badge-blue { @apply badge bg-blue-500/10 text-blue-400; }
+  .badge-yellow { @apply badge bg-yellow-500/10 text-yellow-400; }
+  .badge-red { @apply badge bg-red-500/10 text-red-400; }
+
+  .section-title {
+    @apply text-2xl font-bold mb-6;
+  }
+}
+
+/* Three.js canvas */
+.three-canvas canvas {
+  @apply w-full h-full rounded-2xl;
+}
+
+/* Wizard steps */
+.wizard-step {
+  @apply flex items-center gap-3;
+}
+.wizard-step-dot {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+         transition-all duration-300;
+}
+.wizard-step-dot.active {
+  @apply bg-brand-500 text-white shadow-lg shadow-brand-500/30;
+}
+.wizard-step-dot.completed {
+  @apply bg-brand-500/20 text-brand-400;
+}
+.wizard-step-dot.pending {
+  @apply bg-dark-600 text-dark-300;
+}
+
+/* Plan room colors */
+.room-living { fill: #E8F5E9; stroke: #4CAF50; }
+.room-bedroom { fill: #E3F2FD; stroke: #2196F3; }
+.room-kitchen { fill: #FFF3E0; stroke: #FF9800; }
+.room-bathroom { fill: #E0F7FA; stroke: #00BCD4; }
+.room-entry { fill: #F3E5F5; stroke: #9C27B0; }
+.room-garage { fill: #ECEFF1; stroke: #607D8B; }
+.room-terrace { fill: #F1F8E9; stroke: #8BC34A; }
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
