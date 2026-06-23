@@ -9,6 +9,7 @@
     "install:all": "cd server && npm install && cd ../client && npm install"
   },
   "devDependencies": {
-    "concurrently": "^9.0.1"
+    "concurrently": "^9.0.1",
+    "typescript": "^6.0.3"
   }
 }
